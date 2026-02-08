@@ -231,10 +231,16 @@ function checkCollision() {
   const playerX = laneCenter(game.player.lane);
   const playerY = game.player.y;
   for (const asteroid of game.asteroids) {
-    const dx = asteroid.x - playerX;
-    const dy = asteroid.y - playerY;
-    const distance = Math.hypot(dx, dy);
-    if (distance < asteroid.radius + game.player.width * 0.4) {
+    if (asteroid.lane !== game.player.lane) continue;
+    const missileWidth = asteroid.radius * 0.9;
+    const missileHeight = asteroid.radius * 2.4;
+    const halfMissileW = missileWidth * 0.45;
+    const halfMissileH = missileHeight * 0.45;
+    const halfPlayerW = game.player.width * 0.35;
+    const halfPlayerH = game.player.height * 0.45;
+    const overlapX = Math.abs(asteroid.x - playerX) < halfMissileW + halfPlayerW;
+    const overlapY = Math.abs(asteroid.y - playerY) < halfMissileH + halfPlayerH;
+    if (overlapX && overlapY) {
       game.running = false;
       showNameEntry();
       statusEl.textContent = "Crashed! Press Space to restart.";
