@@ -4,6 +4,10 @@ const ctx = canvas.getContext("2d");
 const scoreEl = document.getElementById("score");
 const statusEl = document.getElementById("status");
 const playerEl = document.getElementById("player");
+const nameEntryEl = document.getElementById("name-entry");
+const nameInputEl = document.getElementById("name-input");
+const nameSubmitEl = document.getElementById("name-submit");
+const leaderboardListEl = document.getElementById("leaderboard-list");
 
 const game = {
   width: canvas.width,
@@ -28,6 +32,8 @@ const game = {
   trackOffset: 0,
   playerName: "---"
 };
+
+const LEADERBOARD_KEY = "space-race-leaderboard";
 
 game.laneWidth = (game.width - game.lanePadding * 2) / game.lanes;
 
@@ -69,12 +75,80 @@ document.addEventListener("keyup", (event) => {
   }
 });
 
-function askPlayerName() {
-  const input = prompt("Enter your 3-letter name:", game.playerName);
-  if (input === null) return;
-  const cleaned = input.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 3);
+nameSubmitEl.addEventListener("click", () => {
+  submitNameEntry();
+});
+
+nameInputEl.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    submitNameEntry();
+  }
+});
+
+function showNameEntry() {
+  nameEntryEl.classList.remove("hidden");
+  nameEntryEl.setAttribute("aria-hidden", "false");
+  nameInputEl.value = "";
+  nameInputEl.focus();
+  renderLeaderboard();
+}
+
+function hideNameEntry() {
+  nameEntryEl.classList.add("hidden");
+  nameEntryEl.setAttribute("aria-hidden", "true");
+}
+
+function submitNameEntry() {
+  const cleaned = nameInputEl.value.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 3);
   game.playerName = cleaned.padEnd(3, "-");
   playerEl.textContent = `Pilot: ${game.playerName}`;
+  saveScore(game.playerName, Math.floor(game.score));
+  renderLeaderboard();
+  hideNameEntry();
+}
+
+function loadLeaderboard() {
+  const raw = localStorage.getItem(LEADERBOARD_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveLeaderboard(entries) {
+  localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
+}
+
+function saveScore(name, score) {
+  if (!score || score <= 0) return;
+  const entries = loadLeaderboard();
+  entries.push({ name, score, time: Date.now() });
+  entries.sort((a, b) => b.score - a.score || a.time - b.time);
+  saveLeaderboard(entries.slice(0, 10));
+}
+
+function renderLeaderboard() {
+  const entries = loadLeaderboard();
+  leaderboardListEl.innerHTML = "";
+  if (entries.length === 0) {
+    const empty = document.createElement("li");
+    empty.textContent = "No scores yet";
+    leaderboardListEl.appendChild(empty);
+    return;
+  }
+  entries.forEach((entry, index) => {
+    const item = document.createElement("li");
+    const rank = document.createElement("span");
+    rank.textContent = `${index + 1}. ${entry.name}`;
+    const value = document.createElement("span");
+    value.textContent = entry.score.toString();
+    item.appendChild(rank);
+    item.appendChild(value);
+    leaderboardListEl.appendChild(item);
+  });
 }
 
 function resetGame() {
@@ -162,6 +236,7 @@ function checkCollision() {
     const distance = Math.hypot(dx, dy);
     if (distance < asteroid.radius + game.player.width * 0.4) {
       game.running = false;
+      showNameEntry();
       statusEl.textContent = "Crashed! Press Space to restart.";
       return true;
     }
@@ -368,5 +443,4 @@ function loop(timestamp) {
   }
 }
 
-askPlayerName();
 requestAnimationFrame(loop);

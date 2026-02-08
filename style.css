@@ -53,3 +53,93 @@ canvas#game {
   background: #05050c;
   border: 2px solid rgba(120, 180, 255, 0.2);
 }
+
+.name-entry {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(4, 8, 12, 0.6);
+  z-index: 20;
+  backdrop-filter: blur(2px);
+}
+
+.name-entry.hidden {
+  display: none;
+}
+
+.name-card {
+  background: rgba(10, 18, 30, 0.92);
+  border: 1px solid rgba(120, 180, 255, 0.3);
+  padding: 18px 20px;
+  border-radius: 12px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55);
+  text-align: center;
+  min-width: 220px;
+}
+
+.name-title {
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.name-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+#name-input {
+  width: 76px;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 18px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(120, 180, 255, 0.4);
+  background: rgba(5, 10, 20, 0.9);
+  color: #e8f1ff;
+}
+
+#name-submit {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(120, 180, 255, 0.4);
+  background: #2b5aa6;
+  color: #e8f1ff;
+  cursor: pointer;
+}
+
+#name-submit:hover {
+  background: #3870c8;
+}
+
+.leaderboard-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  margin-bottom: 6px;
+}
+
+.leaderboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.leaderboard-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(20, 30, 50, 0.6);
+}
